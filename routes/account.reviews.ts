@@ -5,6 +5,7 @@ import moment from "moment";
 import csrf from "csrf";
 const tokens = new csrf();
 
+
 const DATE_FORMAT = "YYYY/MM/DD";
 
 let validateReviewData = (req: express.Request) => {
@@ -39,9 +40,9 @@ router.get("/regist/:shopId(\\d+)", async (req, res, next) => {
   let shop, shopName, review, results;
   let token, secret;
 
-  // sessionの開始
+  // 秘密鍵の生成
   secret = await tokens.secret();
-  // セッションIDの発行
+  // トークンの生成
   token = tokens.create(secret);
   //
   req.session._csrf = secret;

@@ -60,10 +60,6 @@ app.use("/search", require("./routes/search"));
 app.use("/shops", require("./routes/shops"));
 app.use("/", require("./routes/index"));
 
-// app.get('/', (req: express.Request, res: express.Response) => {
-//   res.end("Hello World");
-// });
-
 // custom error page
 app.use((req, res, next) => {
   res.status(404);
@@ -82,5 +78,4 @@ app.use((req, res, next) => {
  */
 app.listen(appconfig.PORT, () => {
   logger.info(`Application listening at ${appconfig.PORT}`);
-  // console.log(`Application listening at ${PORT}`);
 });

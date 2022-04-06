@@ -1,0 +1,99 @@
+
+[セッション管理に使用したライブラリ]
+  ・express-session
+  ・express-mysql-session
+  ・csrf
+  ・mysqlStore
+
+
+[セッション管理の仕組み]
+  ページを開いた際にセッションIDが発行されるようになり、
+  サーバ側にはsroreで指定した保存先、クライアント側ではcookieにセッションIDが保存される。
+  セッション管理を行うことでログインした状態でブラウザを閉じたりしてもログイン状態を維持できるようになる。
+  ・セッションの使用宣言、設定
+    app.use(
+      session({
+        store: new MySQLStore({
+          host: dbconfig.HOST,
+          port: dbconfig.PORT,
+          user: dbconfig.USERNAME,
+          password: dbconfig.PASSWORD,
+          database: dbconfig.DATABASE,
+        }),
+        cookie: {
+          secure: IS_PRODUCTION,
+        },
+        secret: appconfig.security.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        name: "sid",
+      })
+    );
+    store: sessionデータの保存先を指定(今回はmysqlStoreを使用し、DBに保存),
+    cookie: {
+      secure: HTTPSでアクセスした場合のみcookieを有効にするかどうか,
+    },
+    secret: 文字列を指定(暗号化キー),
+    resave: セッションの値が変更されなかった場合に、セッションを更新するかどうか
+    saveUninitialized: 初期化せれていないセッションを保存するかどうか(regenerateなどで初期されていないセッションを保存する場合true)
+    name: プロパティ名
+
+  ・ログインに成功した場合の処理としてセッションIDを再生成する。
+    req.session.regenerate((err) => {
+      if (err) {
+        done(err);
+      } else {
+        done(null, user);
+      }
+    });
+
+  ・リクエストからセッションを取得できる
+    req.session
+
+
+[DB操作に使用したライブラリ]
+・mysql2
+・util
+
+
+[DB操作の簡単な仕組み]
+  1. 使用DBの設定を定数に保存
+  const connection = createConnection(config)
+  const connection = createPool(config)
+
+  2. DB接続
+  ・createConnection()の場合
+    connection.connect()
+  ・createPool()の場合
+    connection.getConnection()
+  3. DB操作
+  connection.query("placeholderを用いたsql文", [値])
+  ※createPool().query()の場合はgetConnection()、query()、release()が実行される。
+
+  ・poolを使用している場合はpoolを解放する
+  connection.getConnection().release()
+
+  4. DB切断
+  connection.end()
+
+
+[DBのトランザクション管理とは]
+  ・複数のDB操作を1つの処理としてすべて成功、または、すべて失敗のどちらかを
+    保証する処理
+
+
+[DBトランザクション管理の仕組み]
+  ※tryの中でトランザクションの処理を実装し、catchにrollbackを実装
+  try{
+    1. DB接続
+    2. トランザクション開始
+      beginTransaction();
+    3. DB操作
+    4-1. 処理の最後にコミットを行う（すべてのDB操作が正常に反映される）
+      commit();
+  } catch{
+    4-2. エラー時にロールバックを行う（DB操作を破棄し反映されない）
+      rollback();
+
+  }
+

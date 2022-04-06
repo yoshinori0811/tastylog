@@ -46,9 +46,9 @@ router.get("/regist/:shopId(\\d+)", (req, res, next) => __awaiter(void 0, void 0
     let shopId = req.params.shopId;
     let shop, shopName, review, results;
     let token, secret;
-    // sessionの開始
+    // 秘密鍵の生成
     secret = yield tokens.secret();
-    // セッションIDの発行
+    // トークンの生成
     token = tokens.create(secret);
     //
     req.session._csrf = secret;

@@ -1,10 +1,8 @@
 const path = require("path");
 const { sql } = require("@garafu/mysql-fileloader")({ root: path.join(__dirname, "./sql") });
-// let pool = require("./pool");
 import * as pool from "./pool"
 
 
-// import { pool } from "./pool";
 const Transaction = require("./transaction");
 
 const MYSQLClient = {

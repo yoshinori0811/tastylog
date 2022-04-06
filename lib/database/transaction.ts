@@ -1,5 +1,4 @@
 import * as pool from "./pool"
-// let pool = require("./pool");
 
 // コネクションを保持、管理する
 const Transaction = class {
@@ -8,9 +7,9 @@ const Transaction = class {
     this.connection = connection;
   }
   async begin() {
-  //   if (this.connection) {
-  //     this.connection.release();
-  //   }
+    if (this.connection) {
+      this.connection.release();
+    }
     this.connection = await pool.getConnection();
     this.connection.beginTransaction();
   }
